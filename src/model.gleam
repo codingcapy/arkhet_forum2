@@ -21,6 +21,8 @@ pub type Route {
   Login
   Signup
   BugReports
+  GeneralDiscussions
+  TechnicalSupport
 }
 
 pub fn initial_route() -> Route {
@@ -39,6 +41,8 @@ pub fn route_from_path(path: List(String)) -> Route {
     ["login"] -> Login
     ["signup"] -> Signup
     ["bugreports"] -> BugReports
+    ["generaldiscussions"] -> GeneralDiscussions
+    ["technicalsupport"] -> TechnicalSupport
     _ -> Home
   }
 }

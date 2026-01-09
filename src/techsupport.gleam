@@ -1,3 +1,4 @@
+import createpost
 import gleam/option
 import lustre/attribute.{class}
 import lustre/element/html
@@ -30,5 +31,9 @@ pub fn view(model: model.Model) {
       html.div([class("md:w-[200px]")], [html.text("Author")]),
       html.div([class("md:w-[50px]")], [html.text("Replies")]),
     ]),
+    case model.show_create_post {
+      True -> createpost.view(model)
+      False -> html.text("")
+    },
   ])
 }

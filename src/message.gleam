@@ -16,5 +16,6 @@ pub type Msg {
   ApiLoggedInUser(Result(api.AuthResult, rsvp.Error))
   Logout
   UserClickedCreatePost(model.Community)
+  UserCancelledCreatePost
   None
 }

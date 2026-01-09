@@ -23,37 +23,41 @@ pub fn view() {
         ],
       ),
     ]),
-    html.div(
-      [
-        class(
-          "p-5 my-3 lg:w-[700px] bg-[#303030] border cursor-pointer hover:bg-[#444444]",
-        ),
-      ],
-      [
-        html.div([class("text-xl font-bold")], [
-          html.text("Technical Support"),
-        ]),
-        html.div([class("text-[#bbbbbb]")], [
-          html.text(
-            "For account issues such as signing up/logging in, billing and payments",
+    html.a([attribute.href("/technicalsupport")], [
+      html.div(
+        [
+          class(
+            "p-5 my-3 lg:w-[700px] bg-[#303030] border cursor-pointer hover:bg-[#444444]",
           ),
-        ]),
-      ],
-    ),
-    html.div(
-      [
-        class(
-          "p-5 my-3 lg:w-[700px] bg-[#303030] border cursor-pointer hover:bg-[#444444]",
-        ),
-      ],
-      [
-        html.div([class("text-xl font-bold")], [
-          html.text("General Discussion"),
-        ]),
-        html.div([class("text-[#bbbbbb]")], [
-          html.text("Discussion about Arkhet"),
-        ]),
-      ],
-    ),
+        ],
+        [
+          html.div([class("text-xl font-bold")], [
+            html.text("Technical Support"),
+          ]),
+          html.div([class("text-[#bbbbbb]")], [
+            html.text(
+              "For account issues such as signing up/logging in, billing and payments",
+            ),
+          ]),
+        ],
+      ),
+    ]),
+    html.a([attribute.href("/generaldiscussions")], [
+      html.div(
+        [
+          class(
+            "p-5 my-3 lg:w-[700px] bg-[#303030] border cursor-pointer hover:bg-[#444444]",
+          ),
+        ],
+        [
+          html.div([class("text-xl font-bold")], [
+            html.text("General Discussion"),
+          ]),
+          html.div([class("text-[#bbbbbb]")], [
+            html.text("Discussion about Arkhet"),
+          ]),
+        ],
+      ),
+    ]),
   ])
 }

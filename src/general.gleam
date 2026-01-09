@@ -1,3 +1,4 @@
+import createpost
 import gleam/option
 import lustre/attribute.{class}
 import lustre/element/html
@@ -8,7 +9,7 @@ import model
 pub fn view(model: model.Model) {
   html.div([class("flex-1 pt-[50px] flex flex-col mx-auto p-2")], [
     html.div([class("text-2xl my-5 font-bold")], [
-      html.text("General Discussion"),
+      html.text("General Discussions"),
     ]),
     case model.current_user {
       option.None -> html.text("")
@@ -30,5 +31,9 @@ pub fn view(model: model.Model) {
       html.div([class("md:w-[200px]")], [html.text("Author")]),
       html.div([class("md:w-[50px]")], [html.text("Replies")]),
     ]),
+    case model.show_create_post {
+      True -> createpost.view(model)
+      False -> html.text("")
+    },
   ])
 }
