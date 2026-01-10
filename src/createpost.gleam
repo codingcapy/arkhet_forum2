@@ -23,6 +23,9 @@ pub fn view(model: model.Model) {
               class(
                 "flex justify-between w-[200px] border px-2 my-2 cursor-pointer hover:bg-[#444444]",
               ),
+              event.on_click(message.UserToggledCreatePostDropdown(
+                model.create_post_ui.show_dropdown,
+              )),
             ],
             [
               case model.create_post_ui.community_id {
@@ -36,7 +39,50 @@ pub fn view(model: model.Model) {
               ]),
             ],
           ),
-          html.div([class("absolute top-[50px] left-0")], [html.text("HERE")]),
+          case model.create_post_ui.show_dropdown {
+            True ->
+              html.div(
+                [
+                  class("absolute top-[40px] left-0 bg-[#444444] w-[200px]"),
+                ],
+                [
+                  html.div(
+                    [
+                      event.on_click(message.UserSelectedCommunity(
+                        model.BugReport,
+                      )),
+                      class("hover:bg-[#555555] cursor-pointer px-2"),
+                    ],
+                    [
+                      html.text("Bug Report"),
+                    ],
+                  ),
+                  html.div(
+                    [
+                      event.on_click(message.UserSelectedCommunity(
+                        model.TechSupport,
+                      )),
+                      class("hover:bg-[#555555] cursor-pointer px-2"),
+                    ],
+                    [
+                      html.text("Technical Support"),
+                    ],
+                  ),
+                  html.div(
+                    [
+                      event.on_click(message.UserSelectedCommunity(
+                        model.General,
+                      )),
+                      class("hover:bg-[#555555] cursor-pointer px-2"),
+                    ],
+                    [
+                      html.text("General Discussion"),
+                    ],
+                  ),
+                ],
+              )
+            False -> html.text("")
+          },
         ]),
         html.input([
           attribute.placeholder("Title"),

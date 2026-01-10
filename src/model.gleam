@@ -69,11 +69,21 @@ pub fn initial_login_ui() -> LoginUi {
 }
 
 pub type CreatePostUi {
-  CreatePostUi(title: String, content: String, community_id: String)
+  CreatePostUi(
+    title: String,
+    content: String,
+    community_id: String,
+    show_dropdown: Bool,
+  )
 }
 
 pub fn initial_create_post_ui() -> CreatePostUi {
-  CreatePostUi(title: "", content: "", community_id: "general")
+  CreatePostUi(
+    title: "",
+    content: "",
+    community_id: "general",
+    show_dropdown: False,
+  )
 }
 
 pub type Community {

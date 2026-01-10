@@ -17,7 +17,7 @@ pub type Msg {
   Logout
   UserClickedCreatePost(model.Community)
   UserCancelledCreatePost
-  UserToggledCreatePostDropdown
+  UserToggledCreatePostDropdown(Bool)
   UserSelectedCommunity(model.Community)
   None
 }
