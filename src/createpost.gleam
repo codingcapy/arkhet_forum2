@@ -17,31 +17,36 @@ pub fn view(model: model.Model) {
       ]),
       html.form([class("flex flex-col")], [
         html.div([class("font-bold")], [html.text("Category")]),
-        html.div(
-          [
-            class(
-              "flex justify-between w-[200px] border px-2 my-2 cursor-pointer hover:bg-[#444444]",
-            ),
-          ],
-          [
-            case model.create_post_ui.community_id {
-              "bugreport" -> html.div([], [html.text("Bug Report")])
-              "general" -> html.div([], [html.text("General Discussion")])
-              "techsupport" -> html.div([], [html.text("Technical Support")])
-              _ -> html.text("")
-            },
-            html.div([class("pt-1")], [
-              html.img([attribute.src("/iconcaretdown.svg")]),
-            ]),
-          ],
-        ),
+        html.div([class("relative")], [
+          html.div(
+            [
+              class(
+                "flex justify-between w-[200px] border px-2 my-2 cursor-pointer hover:bg-[#444444]",
+              ),
+            ],
+            [
+              case model.create_post_ui.community_id {
+                "bugreport" -> html.div([], [html.text("Bug Report")])
+                "general" -> html.div([], [html.text("General Discussion")])
+                "techsupport" -> html.div([], [html.text("Technical Support")])
+                _ -> html.text("")
+              },
+              html.div([class("pt-1")], [
+                html.img([attribute.src("/iconcaretdown.svg")]),
+              ]),
+            ],
+          ),
+          html.div([class("absolute top-[50px] left-0")], [html.text("HERE")]),
+        ]),
         html.input([
           attribute.placeholder("Title"),
+          attribute.required(True),
           class("border px-2 py-1 my-2"),
         ]),
         html.textarea(
           [
             attribute.placeholder("Content"),
+            attribute.required(True),
             class("border px-2 py-1 my-1 h-[100px]"),
           ],
           "",
