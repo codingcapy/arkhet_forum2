@@ -140,7 +140,6 @@ fn update(
         effect.none(),
       )
     }
-    message.None -> #(model, effect.none())
     message.UserClickedCreatePost(community) -> {
       let create_post_ui =
         model.CreatePostUi(
@@ -168,6 +167,42 @@ fn update(
         )
       #(Model(..model, create_post_ui:), effect.none())
     }
+    message.UserChangedPostTitle(title) -> {
+      let create_post_ui =
+        model.CreatePostUi(..model.create_post_ui, title: title)
+      #(Model(..model, create_post_ui:), effect.none())
+    }
+    message.UserChangedPostContent(content) -> {
+      let create_post_ui =
+        model.CreatePostUi(..model.create_post_ui, content: content)
+      #(Model(..model, create_post_ui:), effect.none())
+    }
+    message.UserSubmittedCreatePost -> {
+      let title = echo model.create_post_ui.title |> string.trim()
+      let content = echo model.create_post_ui.content |> string.trim()
+      let community_id = echo model.create_post_ui.community_id |> string.trim()
+      case title == "" {
+        True -> #(model, effect.none())
+        False -> {
+          case model.current_user {
+            option.Some(user) -> {
+              let fx =
+                api.post_create_post(
+                  message.ApiCreatedPost,
+                  user_id: user.user_id,
+                  title:,
+                  content:,
+                  community_id:,
+                )
+              #(model, fx)
+            }
+            option.None -> #(model, effect.none())
+          }
+        }
+      }
+    }
+    message.ApiCreatedPost(_) -> todo
+    message.None -> #(model, effect.none())
   }
 }
 
@@ -271,14 +306,20 @@ fn view(model: Model) {
             ]),
             html.textarea(
               [
-                attribute.placeholder("Content"),
-                attribute.required(True),
+                attribute.placeholder("Title"),
+                attribute.name("title"),
+                attribute.id("title"),
+                event.on_change(message.UserChangedPostTitle),
                 class("border px-2 py-1 my-1 h-[100px]"),
               ],
               "",
             ),
             html.button(
               [
+                attribute.placeholder("Content"),
+                attribute.name("content"),
+                attribute.id("content"),
+                event.on_change(message.UserChangedPostContent),
                 class(
                   "my-2 px-3 py-1 bg-[#9253E4] cursor-pointer hover:bg-[#A364F5]",
                 ),

@@ -19,5 +19,9 @@ pub type Msg {
   UserCancelledCreatePost
   UserToggledCreatePostDropdown(Bool)
   UserSelectedCommunity(model.Community)
+  UserChangedPostTitle(String)
+  UserChangedPostContent(String)
+  UserSubmittedCreatePost
+  ApiCreatedPost(Result(api.Post, rsvp.Error))
   None
 }

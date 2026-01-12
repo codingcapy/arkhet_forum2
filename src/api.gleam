@@ -20,6 +20,18 @@ pub type AuthResult {
   AuthResult(user: User, token: String)
 }
 
+pub type Post {
+  Post(
+    post_id: Int,
+    user_id: String,
+    community_id: String,
+    title: String,
+    content: String,
+    status: String,
+    created_at: String,
+  )
+}
+
 fn user_decoder() -> decode.Decoder(User) {
   use user_id <- decode.field("userId", decode.string)
   use username <- decode.field("username", decode.string)
@@ -39,6 +51,25 @@ fn user_decoder() -> decode.Decoder(User) {
     role:,
     status:,
     preference:,
+    created_at:,
+  ))
+}
+
+fn post_decoder() {
+  use post_id <- decode.field("postId", decode.int)
+  use user_id <- decode.field("userId", decode.string)
+  use community_id <- decode.field("communityId", decode.string)
+  use title <- decode.field("title", decode.string)
+  use content <- decode.field("content", decode.string)
+  use status <- decode.field("status", decode.string)
+  use created_at <- decode.field("createdAt", decode.string)
+  decode.success(Post(
+    post_id:,
+    user_id:,
+    community_id:,
+    title:,
+    content:,
+    status:,
     created_at:,
   ))
 }
@@ -89,4 +120,26 @@ pub fn post_login(msg_wrapper wrapper, email email, password password) {
 pub fn validate_jwt(msg_wrapper wrapper, token token) {
   let handler = rsvp.expect_json(decode.at(["result"], user_decoder()), wrapper)
   rsvp.post(echo base_url() <> "/user/validation", json.null(), handler)
+}
+
+pub fn post_create_post(
+  msg_wrapper wrapper,
+  user_id user_id,
+  community_id community_id,
+  title title,
+  content content,
+) {
+  let handler = {
+    rsvp.expect_json(decode.at(["newPost"], post_decoder()), wrapper)
+  }
+  rsvp.post(
+    echo base_url() <> "/posts",
+    json.object([
+      #("userId", json.string(user_id)),
+      #("communityId", json.string(community_id)),
+      #("title", json.string(title)),
+      #("content", json.string(content)),
+    ]),
+    handler,
+  )
 }
