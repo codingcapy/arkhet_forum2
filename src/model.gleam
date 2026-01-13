@@ -2,7 +2,9 @@ import api
 import gleam/option
 import gleam/result
 import gleam/uri
+import lib/async_data
 import modem
+import rsvp
 
 pub type Model {
   Model(
@@ -13,6 +15,7 @@ pub type Model {
     current_user: option.Option(api.User),
     create_post_ui: CreatePostUi,
     show_create_post: Bool,
+    posts: async_data.AsyncData(List(api.Post), rsvp.Error),
   )
 }
 

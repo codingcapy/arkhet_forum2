@@ -143,3 +143,11 @@ pub fn post_create_post(
     handler,
   )
 }
+
+pub fn get_posts(msg_wrapper wrapper) {
+  let handler = {
+    rsvp.expect_json(decode.list(post_decoder()), wrapper)
+  }
+
+  rsvp.get(base_url() <> "/posts", handler)
+}

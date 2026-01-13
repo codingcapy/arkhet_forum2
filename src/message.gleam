@@ -23,5 +23,6 @@ pub type Msg {
   UserChangedPostContent(String)
   UserSubmittedCreatePost
   ApiCreatedPost(Result(api.Post, rsvp.Error))
+  ApiReturnedPosts(Result(List(api.Post), rsvp.Error))
   None
 }

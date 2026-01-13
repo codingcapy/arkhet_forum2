@@ -1,21 +1,21 @@
 import api
 import bugreports
-import createpost
 import general
 import gleam/io
+import gleam/list
 import gleam/option
 import gleam/string
 import gleam/uri
 import header
 import home
+import lib/async_data
 import login
 import lustre
-import lustre/attribute.{class}
+import lustre/attribute
 import lustre/effect
 import lustre/element/html
-import lustre/event
 import message
-import model.{type Model, type Route, BugReports, Home, Login, Model, Signup}
+import model.{type Model, BugReports, Home, Login, Model, Signup}
 import modem
 import signup
 import techsupport
@@ -36,6 +36,7 @@ fn init(_) {
       current_user: option.None,
       create_post_ui: model.initial_create_post_ui(),
       show_create_post: False,
+      posts: async_data.Loading,
     )
   let fx = effect.batch([modem.init(on_url_change)])
   #(model, fx)
@@ -201,7 +202,31 @@ fn update(
         }
       }
     }
-    message.ApiCreatedPost(_) -> todo
+    message.ApiCreatedPost(Ok(_)) -> {
+      #(
+        Model(
+          ..model,
+          create_post_ui: model.initial_create_post_ui(),
+          show_create_post: False,
+          posts: async_data.Loading,
+        ),
+        api.get_posts(message.ApiReturnedPosts),
+      )
+    }
+    message.ApiCreatedPost(Error(error)) -> {
+      echo error
+
+      let posts = {
+        use posts <- async_data.map(model.posts)
+        posts
+        |> list.filter(fn(post) { post.post_id != 0 })
+      }
+
+      #(Model(..model, posts:), effect.none())
+    }
+    message.ApiReturnedPosts(result) -> {
+      #(Model(..model, posts: async_data.Done(result)), effect.none())
+    }
     message.None -> #(model, effect.none())
   }
 }
@@ -219,129 +244,6 @@ fn view(model: Model) {
         model.GeneralDiscussions -> general.view(model)
         model.TechnicalSupport -> techsupport.view(model)
       },
-      html.div(
-        [
-          class(
-            "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#333333] p-6 rounded shadow-lg w-[90%] max-w-md z-100",
-          ),
-        ],
-        [
-          html.div([class("text-2xl font-bold mb-3")], [
-            html.text("Create Post"),
-          ]),
-          html.form([class("flex flex-col")], [
-            html.div([class("font-bold")], [html.text("Category")]),
-            html.div([class("relative")], [
-              html.div(
-                [
-                  class(
-                    "flex justify-between w-[200px] border px-2 my-2 cursor-pointer hover:bg-[#444444]",
-                  ),
-                  event.on_click(message.UserToggledCreatePostDropdown(
-                    model.create_post_ui.show_dropdown,
-                  )),
-                ],
-                [
-                  case model.create_post_ui.community_id {
-                    "bugreport" -> html.div([], [html.text("Bug Report")])
-                    "general" -> html.div([], [html.text("General Discussion")])
-                    "techsupport" ->
-                      html.div([], [html.text("Technical Support")])
-                    _ -> html.text("")
-                  },
-                  html.div([class("pt-1")], [
-                    html.img([attribute.src("/iconcaretdown.svg")]),
-                  ]),
-                ],
-              ),
-              case model.create_post_ui.show_dropdown {
-                True ->
-                  html.div(
-                    [
-                      class("absolute top-[40px] left-0 bg-[#444444] w-[200px]"),
-                    ],
-                    [
-                      html.div(
-                        [
-                          event.on_click(message.UserSelectedCommunity(
-                            model.BugReport,
-                          )),
-                          class("hover:bg-[#555555] cursor-pointer px-2"),
-                        ],
-                        [
-                          html.text("Bug Report"),
-                        ],
-                      ),
-                      html.div(
-                        [
-                          event.on_click(message.UserSelectedCommunity(
-                            model.TechSupport,
-                          )),
-                          class("hover:bg-[#555555] cursor-pointer px-2"),
-                        ],
-                        [
-                          html.text("Technical Support"),
-                        ],
-                      ),
-                      html.div(
-                        [
-                          event.on_click(message.UserSelectedCommunity(
-                            model.General,
-                          )),
-                          class("hover:bg-[#555555] cursor-pointer px-2"),
-                        ],
-                        [
-                          html.text("General Discussion"),
-                        ],
-                      ),
-                    ],
-                  )
-                False -> html.text("")
-              },
-            ]),
-            html.input([
-              attribute.placeholder("Title"),
-              attribute.required(True),
-              class("border px-2 py-1 my-2"),
-            ]),
-            html.textarea(
-              [
-                attribute.placeholder("Title"),
-                attribute.name("title"),
-                attribute.id("title"),
-                event.on_change(message.UserChangedPostTitle),
-                class("border px-2 py-1 my-1 h-[100px]"),
-              ],
-              "",
-            ),
-            html.button(
-              [
-                attribute.placeholder("Content"),
-                attribute.name("content"),
-                attribute.id("content"),
-                event.on_change(message.UserChangedPostContent),
-                class(
-                  "my-2 px-3 py-1 bg-[#9253E4] cursor-pointer hover:bg-[#A364F5]",
-                ),
-              ],
-              [
-                html.text("CREATE"),
-              ],
-            ),
-            html.div(
-              [
-                event.on_click(message.UserCancelledCreatePost),
-                class(
-                  "my-2 px-3 py-1 bg-[#444444] cursor-pointer hover:bg-[#555555] text-center",
-                ),
-              ],
-              [
-                html.text("Cancel"),
-              ],
-            ),
-          ]),
-        ],
-      ),
     ],
   )
 }
