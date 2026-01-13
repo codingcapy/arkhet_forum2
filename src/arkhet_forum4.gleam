@@ -38,7 +38,11 @@ fn init(_) {
       show_create_post: False,
       posts: async_data.Loading,
     )
-  let fx = effect.batch([modem.init(on_url_change)])
+  let fx =
+    effect.batch([
+      modem.init(on_url_change),
+      fetch_posts_for_route(model.route),
+    ])
   #(model, fx)
 }
 
@@ -271,4 +275,17 @@ fn on_url_change(uri: uri.Uri) -> message.Msg {
   |> uri.path_segments
   |> model.route_from_path
   |> message.OnRouteChange
+}
+
+fn fetch_posts_for_route(route: model.Route) -> effect.Effect(message.Msg) {
+  case route {
+    model.BugReports -> api.get_bugreport_posts(message.ApiReturnedPosts)
+
+    model.TechnicalSupport ->
+      api.get_techsupport_posts(message.ApiReturnedPosts)
+
+    model.GeneralDiscussions -> api.get_general_posts(message.ApiReturnedPosts)
+
+    _ -> effect.none()
+  }
 }
