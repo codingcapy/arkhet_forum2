@@ -148,6 +148,26 @@ pub fn get_posts(msg_wrapper wrapper) {
   let handler = {
     rsvp.expect_json(decode.list(post_decoder()), wrapper)
   }
-
   rsvp.get(base_url() <> "/posts", handler)
+}
+
+pub fn get_bugreport_posts(msg_wrapper wrapper) {
+  let handler = {
+    rsvp.expect_json(decode.list(post_decoder()), wrapper)
+  }
+  rsvp.get(base_url() <> "/posts/bugreports", handler)
+}
+
+pub fn get_techsupport_posts(msg_wrapper wrapper) {
+  let handler = {
+    rsvp.expect_json(decode.list(post_decoder()), wrapper)
+  }
+  rsvp.get(base_url() <> "/posts/techsupport", handler)
+}
+
+pub fn get_general_posts(msg_wrapper wrapper) {
+  let handler = {
+    rsvp.expect_json(decode.list(post_decoder()), wrapper)
+  }
+  rsvp.get(base_url() <> "/posts/general", handler)
 }

@@ -47,10 +47,23 @@ fn update(
   msg: message.Msg,
 ) -> #(Model, effect.Effect(message.Msg)) {
   case echo msg {
-    message.OnRouteChange(route) -> #(
-      model.Model(..model, route: route),
-      effect.none(),
-    )
+    message.OnRouteChange(route) -> {
+      case route {
+        model.BugReports -> #(
+          Model(..model, route: route, posts: async_data.Loading),
+          api.get_bugreport_posts(message.ApiReturnedPosts),
+        )
+        model.TechnicalSupport -> #(
+          Model(..model, route: route, posts: async_data.Loading),
+          api.get_techsupport_posts(message.ApiReturnedPosts),
+        )
+        model.GeneralDiscussions -> #(
+          Model(..model, route: route, posts: async_data.Loading),
+          api.get_general_posts(message.ApiReturnedPosts),
+        )
+        _ -> #(Model(..model, route: route), effect.none())
+      }
+    }
     message.Navigate(path) -> #(
       model,
       modem.push(path, option.None, option.None),
@@ -210,18 +223,23 @@ fn update(
           show_create_post: False,
           posts: async_data.Loading,
         ),
-        api.get_posts(message.ApiReturnedPosts),
+        case model.route {
+          model.BugReports -> api.get_bugreport_posts(message.ApiReturnedPosts)
+          model.TechnicalSupport ->
+            api.get_techsupport_posts(message.ApiReturnedPosts)
+          model.GeneralDiscussions ->
+            api.get_general_posts(message.ApiReturnedPosts)
+          _ -> effect.none()
+        },
       )
     }
     message.ApiCreatedPost(Error(error)) -> {
       echo error
-
       let posts = {
         use posts <- async_data.map(model.posts)
         posts
         |> list.filter(fn(post) { post.post_id != 0 })
       }
-
       #(Model(..model, posts:), effect.none())
     }
     message.ApiReturnedPosts(result) -> {
@@ -240,9 +258,9 @@ fn view(model: Model) {
         Home -> home.view()
         Signup -> signup.view(model)
         Login -> login.view(model)
-        BugReports -> bugreports.view(model)
-        model.GeneralDiscussions -> general.view(model)
-        model.TechnicalSupport -> techsupport.view(model)
+        BugReports -> bugreports.view(model.posts, model)
+        model.GeneralDiscussions -> general.view(model.posts, model)
+        model.TechnicalSupport -> techsupport.view(model.posts, model)
       },
     ],
   )
